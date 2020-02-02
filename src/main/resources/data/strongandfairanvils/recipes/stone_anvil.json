@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DDD",
+    " S ",
+    "SSS"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:polished_diorite"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "item": "strongandfairanvils:stone_anvil"
+  }
+}

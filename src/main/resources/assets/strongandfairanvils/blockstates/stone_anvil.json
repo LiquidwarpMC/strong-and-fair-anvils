@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "strongandfairanvils:block/stone_anvil"
+    },
+    "facing=west": {
+      "model": "strongandfairanvils:block/stone_anvil",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "strongandfairanvils:block/stone_anvil",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "strongandfairanvils:block/stone_anvil",
+      "y": 270
+    }
+  }
+}

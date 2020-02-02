@@ -1,26 +1,27 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "strongandfairanvils",
   "version": "${version}",
-  "name": "Name",
-  "description": "Description",
+  "name": "Strong and Fair Anvils",
+  "description": "Prevents anvil degradation through use, prevents prior work penalty increase, remove experience cost for rename and repairs.",
   "authors": [
     "Liquidwarp"
   ],
   "contact": {
-    "homepage": "https://github.com/LiquidwarpMC",
-    "sources": "https://github.com/LiquidwarpMC/modid"
+    "homepage": "https://github.com/LiquidwarpMC/strong-and-fair-anvils",
+    "sources": "https://github.com/LiquidwarpMC/strong-and-fair-anvils",
+    "issues": "https://github.com/LiquidwarpMC/strong-and-fair-anvils/issues"
   },
   "license": "MIT",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/strongandfairanvils/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.liquidwarpmc.modid.Mod"
+      "net.liquidwarpmc.strongandfairanvils.StrongAndFairAnvils"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "strongandfairanvils.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.2",
