@@ -1,7 +1,9 @@
 # Strong and Fair Anvils
-Anvils: 
-- don't randomly degrade from using them (though they can still degrade from falling)
-- don't increase the prior work penalty
-- don't cost experience levels for repairing and renaming items
+Modifies anvils to:
+- not randomly degrade from using them (though they can still degrade from falling)
+- not increase the prior work penalty (but respect previous value)
+- not cost experience levels for repairing and renaming items
+
+Also adds a Stone Anvil that can only perform operations that do not cost experience levels (renaming and repair).
 
 Uses FABRIC modloader.
