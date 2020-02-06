@@ -38,8 +38,6 @@ public abstract class AnvilContainerMixin {
     @Final
     private Property levelCost;
 
-    @Shadow public abstract int getLevelCost();
-
     @Redirect(
             method = "updateResult",
             at = @At(
