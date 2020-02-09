@@ -12,11 +12,11 @@ Modifies regular anvils:
 Also adds a Stone Anvil that can only perform operations that do not cost experience levels (working on unenchanted items or renaming only).
 
 It can be crafted with this recipe:
-
+```
 [DDD]
 [ S ]
 [SSS]
-
+```
 with D = Polished Diorite (Vanilla) and S = Smooth Stone (Vanilla)
 
 Requires Fabric API.
