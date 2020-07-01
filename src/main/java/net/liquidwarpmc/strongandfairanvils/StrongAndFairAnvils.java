@@ -1,7 +1,7 @@
 package net.liquidwarpmc.strongandfairanvils;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 public class StrongAndFairAnvils implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("StrongAndFairAnvils");
 
-	public static final Block STONE_ANVIL = new AnvilBlock(FabricBlockSettings.of(Material.ANVIL, MaterialColor.STONE).strength(5.0F, 1200.0F).sounds(BlockSoundGroup.ANVIL).build());
+	public static final Block STONE_ANVIL = new AnvilBlock(FabricBlockSettings.of(Material.REPAIR_STATION, MaterialColor.STONE).strength(5.0F, 1200.0F).sounds(BlockSoundGroup.ANVIL));
 
 	@Override
 	public void onInitialize() {

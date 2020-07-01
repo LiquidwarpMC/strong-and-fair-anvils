@@ -4,16 +4,15 @@ import net.liquidwarpmc.strongandfairanvils.SetEmptyItemStackInterface;
 import net.liquidwarpmc.strongandfairanvils.StrongAndFairAnvils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.container.AnvilContainer;
-import net.minecraft.container.BlockContext;
-import net.minecraft.container.Property;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.ForgingScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.Property;
+import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,25 +24,22 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Map;
 
-@Mixin(AnvilContainer.class)
-public abstract class AnvilContainerMixin {
+@Mixin(AnvilScreenHandler.class)
+public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
-    @Shadow
-    @Final
-    private BlockContext context;
+    public AnvilScreenHandlerMixin(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(type, syncId, playerInventory, context);
+    }
+
 
     @Shadow
     @Final
     private Property levelCost;
 
-    @Shadow
-    @Final
-    private Inventory inventory;
 
     /**
      * Disable the default prior work penalty increase.
@@ -52,7 +48,7 @@ public abstract class AnvilContainerMixin {
             method = "updateResult",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/container/AnvilContainer;getNextCost(I)I",
+                    target = "Lnet/minecraft/screen/AnvilScreenHandler;getNextCost(I)I",
                     ordinal = 0
             ),
             require = 1
@@ -77,8 +73,8 @@ public abstract class AnvilContainerMixin {
             require = 1
     )
     private int freeLevelRepairCostBetweenUnenchantedItem(int val) {
-        ItemStack itemStack = this.inventory.getInvStack(0);
-        ItemStack itemStack3 = this.inventory.getInvStack(1);
+        ItemStack itemStack = this.input.getStack(0);
+        ItemStack itemStack3 = this.input.getStack(1);
 
         if(itemStack.hasEnchantments() || itemStack3.hasEnchantments()) {
 //            StrongAndFairAnvils.LOGGER.info("Enchanted items: costly repair");
@@ -88,6 +84,7 @@ public abstract class AnvilContainerMixin {
             return val - 1;
         }
     }
+
 
     /**
      * Don't increase level cost for repair with materials for unenchanted item.
@@ -103,7 +100,7 @@ public abstract class AnvilContainerMixin {
             require = 1
     )
     private int freeLevelRepairCostWithMaterialOfUnenchantedItem(int val) {
-        ItemStack itemStack = this.inventory.getInvStack(0);
+        ItemStack itemStack = this.input.getStack(0);
 
         if(itemStack.hasEnchantments()) {
 //            StrongAndFairAnvils.LOGGER.info("Enchanted item: costly repair with material");
@@ -113,6 +110,7 @@ public abstract class AnvilContainerMixin {
             return val - 2;
         }
    }
+
 
     /**
      * Don't increase level cost for name operations.
@@ -155,6 +153,15 @@ public abstract class AnvilContainerMixin {
         return val - 1;
     }
 
+
+    @ModifyConstant(
+            method = "canTakeOutput(Lnet/minecraft/entity/player/PlayerEntity;Z)Z",
+            constant = @Constant(expandZeroConditions = Constant.Condition.GREATER_THAN_ZERO, ordinal = 0),
+            require = 1
+    )
+    private int canTakeOutput_allowZeroLevelCost(int value) { return -1; }
+
+
     /**
      * Allow operations without level cost.
      */
@@ -168,13 +175,14 @@ public abstract class AnvilContainerMixin {
     )
     private int allowZeroLevelCost(int value) { return -1; }
 
+
     /**
      */
     @Inject(
             method = "updateResult",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/container/Property;set(I)V",
+                    target = "Lnet/minecraft/screen/Property;set(I)V",
                     ordinal = 0,
                     shift = At.Shift.AFTER
             ),
@@ -201,13 +209,14 @@ public abstract class AnvilContainerMixin {
             }
         } else {
             // Increase prior work penalty if item enchantments have been manipulated.
-            Map<Enchantment, Integer> map_original = EnchantmentHelper.getEnchantments(itemStack);
+            Map<Enchantment, Integer> map_original = EnchantmentHelper.get(itemStack);
             if(!map.equals(map_original)) {
 //                StrongAndFairAnvils.LOGGER.info("Enchantments manipulated: increasing prior work penalty");
-                itemStack2.setRepairCost(AnvilContainer.getNextCost(itemStack2.getRepairCost()));
+                itemStack2.setRepairCost(AnvilScreenHandler.getNextCost(itemStack2.getRepairCost()));
             }
         }
     }
+
 
     /**
      * Only allow costless operations to be performed on the stone anvil.
@@ -216,7 +225,7 @@ public abstract class AnvilContainerMixin {
             method = "updateResult",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/container/Property;set(I)V",
+                    target = "Lnet/minecraft/screen/Property;set(I)V",
                     ordinal = 0,
                     shift = At.Shift.AFTER,
                     by = 1
@@ -240,22 +249,10 @@ public abstract class AnvilContainerMixin {
         }
     }
 
-    /**
-     * Whitelist the stone anvil for AnvilInventory screen to show properly.
-     */
-    @Inject(
-            method = "method_17366",
-            at = @At("RETURN"),
-            require = 1,
-            cancellable = true
-    )
-    private static void addStoneAnvilToEligibleBlocks(PlayerEntity player, World world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        BlockState blockState = world.getBlockState(pos);
-        Block block = blockState.getBlock();
-        boolean playerInRange = player.squaredDistanceTo((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D) <= 64.0D;
 
-        if(block == StrongAndFairAnvils.STONE_ANVIL && playerInRange) {
-            cir.setReturnValue(true);
-        }
-    }
+    @ModifyConstant(
+            method = "net/minecraft/screen/AnvilScreenHandler.method_24922(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+            constant = @Constant(floatValue = 0.12F),
+            require = 1)
+    private static float preventRandomAnvilDegradationThroughUse(float value) { return -1.0F; }
 }
